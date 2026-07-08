@@ -1,0 +1,28 @@
+{
+  "name": "Patient Care — NGT Feeding & Medications",
+  "short_name": "Patient Care",
+  "description": "Offline-first patient care PWA: tube-feeding protocol, medication checklist, and audit dashboard.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f766e",
+  "lang": "en",
+  "dir": "auto",
+  "categories": ["medical", "health", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230f766e'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='232' y='120' width='48' height='272' rx='12'/%3E%3Crect x='120' y='232' width='272' height='48' rx='12'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%230f766e'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='216' y='96' width='80' height='320' rx='16'/%3E%3Crect x='96' y='216' width='320' height='80' rx='16'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

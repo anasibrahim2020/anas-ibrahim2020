@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#0f766e" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Patient Care" />
+<title>Patient Care</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230f766e'/%3E%3Cg fill='%23ffffff'%3E%3Crect x='232' y='120' width='48' height='272' rx='12'/%3E%3Crect x='120' y='232' width='272' height='48' rx='12'/%3E%3C/g%3E%3C/svg%3E" />
+<style>
+  :root{
+    --teal:#0f766e; --teal-d:#0b5952; --teal-l:#14b8a6;
+    --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --green:#16a34a; --red:#dc2626; --amber:#d97706;
+    --blue:#2563eb; --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.06);
+    --radius:14px; --tap:48px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans Arabic",sans-serif;
+    background:var(--bg); color:var(--ink); font-size:16px; line-height:1.45;
+    padding-bottom:calc(72px + env(safe-area-inset-bottom));
+    -webkit-text-size-adjust:100%;
+  }
+  html[dir="rtl"] body{font-family:"Noto Sans Arabic","Segoe UI",Tahoma,sans-serif}
+  h1,h2,h3,h4{margin:0 0 .5rem}
+  button{font-family:inherit;font-size:1rem;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:1rem;width:100%;padding:.7rem .8rem;border:1px solid var(--line);
+    border-radius:10px;background:#fff;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--teal-l);border-color:var(--teal)}
+  label{display:block;font-size:.85rem;color:var(--muted);margin:.6rem 0 .25rem;font-weight:600}
+  .hidden{display:none !important}
+
+  /* Header */
+  header{position:sticky;top:0;z-index:40;background:var(--teal);color:#fff;
+    padding:calc(.6rem + env(safe-area-inset-top)) .8rem .6rem;box-shadow:var(--shadow)}
+  .hrow{display:flex;align-items:center;gap:.5rem}
+  .brand{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:.4rem;flex:1;min-width:0}
+  .brand small{font-weight:500;opacity:.85;font-size:.72rem;display:block}
+  .hbtn{background:rgba(255,255,255,.16);border-radius:10px;padding:.45rem .6rem;font-weight:700;
+    min-height:40px;display:inline-flex;align-items:center;gap:.3rem;font-size:.85rem}
+  .hbtn:active{background:rgba(255,255,255,.3)}
+  .nurse-wrap{display:flex;align-items:center;gap:.4rem;margin-top:.55rem;background:rgba(255,255,255,.14);
+    border-radius:10px;padding:.25rem .5rem}
+  .nurse-wrap span{font-size:1.1rem}
+  .nurse-wrap input{background:transparent;border:none;color:#fff;font-weight:700;padding:.35rem .2rem}
+  .nurse-wrap input::placeholder{color:rgba(255,255,255,.7)}
+  .nurse-wrap input:focus{outline:none}
+
+  /* Tabs */
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;background:var(--card);
+    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(15,23,42,.06)}
+  nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:.5rem .2rem;
+    color:var(--muted);font-size:.68rem;font-weight:600;min-height:60px;justify-content:center}
+  nav.tabs button .ic{font-size:1.35rem;line-height:1}
+  nav.tabs button.active{color:var(--teal)}
+  nav.tabs button.active .ic{transform:translateY(-1px)}
+
+  main{max-width:760px;margin:0 auto;padding:.8rem}
+  .view{animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:1rem;margin-bottom:.9rem;box-shadow:var(--shadow)}
+  .card h2{font-size:1.05rem}
+  .card h3{font-size:.95rem}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:.6rem;flex-wrap:wrap}
+  .row>*{flex:1;min-width:120px}
+  .btn{background:var(--teal);color:#fff;border-radius:10px;padding:.7rem 1rem;font-weight:700;
+    min-height:var(--tap);display:inline-flex;align-items:center;justify-content:center;gap:.4rem;width:100%}
+  .btn:active{background:var(--teal-d)}
+  .btn.sec{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+  .btn.red{background:var(--red)} .btn.red:active{background:#b91c1c}
+  .btn.gray{background:#475569}
+  .btn.sm{width:auto;padding:.5rem .8rem;min-height:40px;font-size:.85rem}
+  .pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.72rem;font-weight:700}
+  .pill.green{background:#dcfce7;color:#166534}
+  .pill.red{background:#fee2e2;color:#991b1b}
+  .pill.amber{background:#fef3c7;color:#92400e}
+  .pill.blue{background:#dbeafe;color:#1e40af}
+  .pill.gray{background:#f1f5f9;color:#475569}
+
+  /* progress */
+  .prog{height:14px;border-radius:999px;background:#e2e8f0;overflow:hidden}
+  .prog>i{display:block;height:100%;border-radius:999px;transition:width .35s ease}
+  .prog.food>i{background:linear-gradient(90deg,#f59e0b,#f97316)}
+  .prog.water>i{background:linear-gradient(90deg,#38bdf8,#2563eb)}
+  .prog-label{display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;margin-bottom:.25rem}
+
+  /* banners */
+  .banner{border-radius:12px;padding:.9rem 1rem;font-weight:800;text-align:center;margin-bottom:.9rem}
+  .banner.red{background:var(--red);color:#fff;font-size:1.1rem;letter-spacing:.3px}
+  .banner.warn{background:#fef2f2;color:#991b1b;border:2px solid #fecaca;font-size:1rem;line-height:1.35}
+  .banner.amber{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+
+  /* session / step */
+  .session{border:1px solid var(--line);border-radius:12px;margin-bottom:.8rem;overflow:hidden;background:#fff}
+  .session.active{border-color:var(--teal);box-shadow:0 0 0 2px rgba(15,118,110,.15)}
+  .session-head{display:flex;align-items:center;gap:.5rem;padding:.7rem .8rem;background:#f8fafc;cursor:pointer}
+  .session-head .num{width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
+  .session.done .session-head .num{background:var(--green)}
+  .session-head .t{font-weight:800}
+  .session-head .meta{margin-inline-start:auto;font-size:.75rem}
+  .steps{padding:.4rem .8rem .8rem}
+  .step{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem 0;border-top:1px dashed var(--line)}
+  .step:first-child{border-top:none}
+  .step .sic{font-size:1.3rem;line-height:1.2}
+  .step .sbody{flex:1;min-width:0}
+  .step .stitle{font-weight:700}
+  .step .sdesc{font-size:.8rem;color:var(--muted)}
+  .step .sstamp{font-size:.72rem;color:var(--green);font-weight:700;margin-top:.15rem}
+  .step.locked{opacity:.45}
+  .stepbtn{min-height:40px;padding:.4rem .8rem;border-radius:9px;font-weight:800;background:var(--teal);color:#fff;white-space:nowrap}
+  .stepbtn:disabled{background:#cbd5e1;color:#fff}
+  .stepbtn.done{background:var(--green)}
+  .timer{font-variant-numeric:tabular-nums;font-weight:800;color:var(--teal);font-size:.9rem;margin-top:.25rem}
+
+  /* checklist item */
+  .item{display:flex;align-items:flex-start;gap:.6rem;padding:.65rem 0;border-top:1px solid var(--line)}
+  .item:first-child{border-top:none}
+  .item .chk{width:26px;height:26px;border:2px solid var(--teal);border-radius:7px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;background:#fff;cursor:pointer;margin-top:1px}
+  .item.done .chk{background:var(--green);border-color:var(--green)}
+  .item .ibody{flex:1;min-width:0}
+  .item .iname{font-weight:700}
+  .item .isub{font-size:.78rem;color:var(--muted)}
+  .item .istamp{font-size:.72rem;color:var(--green);font-weight:700}
+  .subchk{display:flex;gap:1rem;margin-top:.4rem;flex-wrap:wrap}
+  .subchk label{display:inline-flex;align-items:center;gap:.35rem;margin:0;color:var(--ink);font-size:.8rem;cursor:pointer}
+  .subchk input{width:20px;height:20px;flex:none}
+  .slot-time{display:inline-flex;align-items:center;gap:.4rem;background:var(--teal);color:#fff;
+    padding:.2rem .6rem;border-radius:8px;font-weight:800;font-size:.85rem;margin-bottom:.2rem}
+  .missed{border-inline-start:3px solid var(--red);padding-inline-start:.6rem}
+
+  /* timeline */
+  .tl{position:relative;margin:.5rem 0 0}
+  .tl-item{display:flex;gap:.7rem;padding:.5rem 0;border-top:1px solid var(--line)}
+  .tl-item:first-child{border-top:none}
+  .tl-time{font-variant-numeric:tabular-nums;font-weight:800;font-size:.8rem;width:64px;flex-shrink:0;color:var(--muted)}
+  .tl-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
+  .tl-dot.green{background:var(--green)} .tl-dot.red{background:var(--red)} .tl-dot.amber{background:var(--amber)}
+  .tl-body{flex:1;min-width:0}
+  .tl-body .a{font-weight:700} .tl-body .d{font-size:.78rem;color:var(--muted)}
+
+  .counters{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin:.4rem 0}
+  .counter{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:.5rem;text-align:center}
+  .counter .n{font-size:1.4rem;font-weight:900} .counter .l{font-size:.68rem;color:var(--muted);font-weight:700}
+
+  .rem{display:flex;align-items:center;gap:.6rem;padding:.55rem 0;border-top:1px dashed var(--line)}
+  .rem:first-child{border-top:none}
+  .rem .ric{font-size:1.3rem} .rem .rt{flex:1;font-weight:700}
+  .rem .rc{font-weight:900;color:var(--teal);font-variant-numeric:tabular-nums}
+  .rem .rc.soon{color:var(--red)}
+
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th,td{text-align:start;padding:.5rem .4rem;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+
+  /* emergency card */
+  .ecard{border:3px solid var(--red);border-radius:14px;overflow:hidden;background:#fff}
+  .ecard .ehead{background:var(--red);color:#fff;padding:.7rem 1rem;font-weight:900;font-size:1.1rem;
+    display:flex;justify-content:space-between;align-items:center}
+  .ecard .ebody{padding:1rem}
+  .ecall{background:var(--red);color:#fff;text-align:center;font-weight:900;font-size:1.35rem;
+    padding:.9rem;border-radius:10px;margin-top:1rem;letter-spacing:.5px}
+  .dx{list-style:none;padding:0;margin:.4rem 0}
+  .dx li{padding:.35rem 0;border-bottom:1px dashed var(--line);font-weight:600}
+  .dx li::before{content:"⚠️ ";}
+
+  .toast-wrap{position:fixed;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom));z-index:200;
+    display:flex;flex-direction:column;align-items:center;gap:.4rem;pointer-events:none;padding:0 .8rem}
+  .toast{background:var(--ink);color:#fff;padding:.7rem 1rem;border-radius:12px;font-weight:700;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:100%;animation:pop .25s ease}
+  .toast.ok{background:var(--green)} .toast.err{background:var(--red)} .toast.info{background:var(--blue)}
+  @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .modal{position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.55);display:flex;align-items:center;
+    justify-content:center;padding:1rem}
+  .modal .box{background:#fff;border-radius:16px;padding:1.2rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+
+  .kv{display:flex;justify-content:space-between;gap:1rem;padding:.4rem 0;border-bottom:1px dashed var(--line)}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--muted);font-weight:600} .kv .v{font-weight:700;text-align:end}
+
+  pre.sql{background:#0f172a;color:#e2e8f0;padding:.9rem;border-radius:10px;overflow:auto;font-size:.72rem;
+    line-height:1.4;max-height:260px}
+  .status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-inline-end:.35rem}
+  .status-dot.on{background:var(--green)} .status-dot.off{background:var(--amber)}
+  details summary{cursor:pointer;font-weight:700;padding:.3rem 0}
+  .acc-head{display:flex;align-items:center;gap:.5rem;font-weight:800;margin:.2rem 0 .4rem;font-size:.95rem}
+
+  @media print{
+    header,nav.tabs,.toast-wrap,.no-print{display:none !important}
+    body{background:#fff;padding:0} main{max-width:100%;padding:0}
+    .card{box-shadow:none;border:1px solid #999;break-inside:avoid}
+    .print-only{display:block !important}
+    #print-scope [data-view]{display:none !important}
+  }
+  .print-only{display:none}
+  .center{text-align:center}
+  .sp{height:.5rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="brand">
+      <span>🩺</span>
+      <div style="min-width:0">
+        <div data-i18n="appTitle">Patient Care</div>
+        <small data-i18n="appSub">NGT Feeding & Medications</small>
+      </div>
+    </div>
+    <button class="hbtn" id="langBtn" title="Language">🌐 <span id="langLabel">AR</span></button>
+    <button class="hbtn" id="notifBtn" title="Notifications">🔔</button>
+  </div>
+  <div class="nurse-wrap">
+    <span>👤</span>
+    <input id="nurseName" autocomplete="name" data-i18n-ph="nursePh" placeholder="Nurse name…" />
+  </div>
+</header>
+
+<main id="app">
+  <!-- Views injected/toggled by JS -->
+  <section class="view" data-view="patient"></section>
+  <section class="view hidden" data-view="today"></section>
+  <section class="view hidden" data-view="meds"></section>
+  <section class="view hidden" data-view="report"></section>
+  <section class="view hidden" data-view="admin"></section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="patient" class="active"><span class="ic">🧑‍⚕️</span><span data-i18n="tabPatient">Patient</span></button>
+  <button data-tab="today"><span class="ic">🍼</span><span data-i18n="tabToday">Today</span></button>
+  <button data-tab="meds"><span class="ic">💊</span><span data-i18n="tabMeds">Medications</span></button>
+  <button data-tab="report"><span class="ic">📋</span><span data-i18n="tabReport">Report</span></button>
+  <button data-tab="admin"><span class="ic">🔐</span><span data-i18n="tabAdmin">Admin</span></button>
+</nav>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+"use strict";
+/* =========================================================================
+   Patient Care PWA — single-file app logic
+   Data layer: Supabase (if configured) with localStorage mirror/fallback.
+   ========================================================================= */
+
+/* ---------- tiny helpers ---------- */
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const el = (t, props={}, kids=[]) => {
+  const n = document.createElement(t);
+  for (const k in props){
+    if (k==='class') n.className=props[k];
+    else if (k==='html') n.innerHTML=props[k];
+    else if (k==='text') n.textContent=props[k];
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), props[k]);
+    else if (k==='data') for (const d in props.data) n.dataset[d]=props.data[d];
+    else if (props[k]===null || props[k]===false || props[k]===undefined) continue;
+    else n.setAttribute(k, props[k]);
+  }
+  (Array.isArray(kids)?kids:[kids]).forEach(c=>{ if(c==null)return;
+    n.appendChild(typeof c==='string'?document.createTextNode(c):c); });
+  return n;
+};
+const pad = n => String(n).padStart(2,'0');
+const todayISO = (d=new Date()) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const nowStamp = () => new Date().toISOString();
+const timeHM = (iso) => { const d = iso?new Date(iso):new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const parseHM = (hm) => { const [h,m]=hm.split(':').map(Number); return {h,m}; };
+const uid = () => 'id_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+async function sha256(str){
+  try{
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){ // insecure context fallback (non-crypto, still deterministic)
+    let h=0; for(let i=0;i<str.length;i++){h=(h<<5)-h+str.charCodeAt(i)|0;} return 'w'+(h>>>0).toString(16);
+  }
+}
+
+/* ---------- toast ---------- */
+function toast(msg, kind='ok', ms=2200){
+  const t = el('div',{class:'toast '+kind,text:msg});
+  $('#toasts').appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(8px)';
+    setTimeout(()=>t.remove(),250); }, ms);
+}
+
+/* =========================================================================
+   STATE + SETTINGS
+   ========================================================================= */
+const LS = {
+  get:(k,d)=>{ try{const v=localStorage.getItem(k); return v==null?d:JSON.parse(v);}catch(e){return d;} },
+  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} },
+};
+
+const DEFAULT_PROFILE = {
+  name:'', national_id:'', hc_number:'', dob:'', gender:'', address:'',
+  diagnosis_notes:'Tube-fed patient (NGT). T-Tube present. Seizure disorder (on Levetiracetam). '
+    +'Diabetic (on Linagliptin). On anticoagulant (Clopidogrel). Sedated at night (Clonazepam).'
+};
+
+const settings = {
+  feeding_start_time: LS.get('feeding_start_time','06:00'),
+  admin_password_hash: LS.get('admin_password_hash',''),
+  sb_url: LS.get('sb_url',''),
+  sb_key: LS.get('sb_key',''),
+};
+let profile = LS.get('patient_profile', DEFAULT_PROFILE);
+let lang = LS.get('lang','en');
+let nurse = LS.get('nurse_name','');
+
+/* Fixed clinical reference dates from the spec */
+const FIXED = {
+  ngt_change:'2026-08-13',
+  ttube_change:'2026-09-08',
+  vitd_base:'2026-07-29',   // then every 30 days
+};
+
+/* =========================================================================
+   i18n
+   ========================================================================= */
+const I18N = {
+  en:{
+    appTitle:'Patient Care', appSub:'NGT Feeding & Medications', nursePh:'Nurse name…',
+    tabPatient:'Patient', tabToday:'Today', tabMeds:'Medications', tabReport:'Report', tabAdmin:'Admin',
+    needNurse:'Enter the nurse name in the header first.',
+    saved:'Saved', logged:'Logged', done:'Done',
+  },
+  ar:{
+    appTitle:'رعاية المريض', appSub:'التغذية الأنبوبية والأدوية', nursePh:'اسم الممرض…',
+    tabPatient:'المريض', tabToday:'اليوم', tabMeds:'الأدوية', tabReport:'التقرير', tabAdmin:'المشرف',
+    needNurse:'أدخل اسم الممرض في الأعلى أولاً.',
+    saved:'تم الحفظ', logged:'تم التسجيل', done:'تم',
+  }
+};
+function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k; }
+function applyI18n(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==='ar' ? 'rtl' : 'ltr';
+  $('#langLabel').textContent = lang==='ar' ? 'EN' : 'AR';
+  $$('[data-i18n]').forEach(n=> n.textContent = t(n.dataset.i18n));
+  $$('[data-i18n-ph]').forEach(n=> n.placeholder = t(n.dataset.i18nPh));
+}
+
+/* =========================================================================
+   DATA LAYER — Supabase w/ localStorage fallback
+   Every logging action writes to (a) its specific table and (b) action_log.
+   localStorage keys mirror table rows so the app is fully offline-capable.
+   ========================================================================= */
+const DB = {
+  client:null, ready:false,
+  async init(){
+    this.ready=false; this.client=null;
+    if(settings.sb_url && settings.sb_key){
+      try{
+        if(!window.supabase){ await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js'); }
+        if(window.supabase){
+          this.client = window.supabase.createClient(settings.sb_url, settings.sb_key);
+          // light connectivity check
+          const { error } = await this.client.from('settings').select('key').limit(1);
+          if(!error){ this.ready=true; }
+        }
+      }catch(e){ console.warn('Supabase init failed, using local:', e); }
+    }
+    updateSyncBadge();
+    return this.ready;
+  },
+  _lsKey(table){ return 'tbl_'+table; },
+  _lsAll(table){ return LS.get(this._lsKey(table), []); },
+  _lsPush(table,row){ const a=this._lsAll(table); a.push(row); LS.set(this._lsKey(table),a); },
+
+  async insert(table, row){
+    if(!row.id) row.id = uid();
+    // local mirror always
+    this._lsPush(table,row);
+    if(this.ready){
+      try{ const {error}=await this.client.from(table).insert(row); if(error) console.warn('insert',table,error.message); }
+      catch(e){ console.warn('insert err',e); }
+    }
+    return row;
+  },
+  async select(table, {filters={}, gte, lte, col}={}){
+    if(this.ready){
+      try{
+        let q=this.client.from(table).select('*');
+        for(const k in filters) q=q.eq(k,filters[k]);
+        if(gte&&col) q=q.gte(col,gte);
+        if(lte&&col) q=q.lte(col,lte);
+        const {data,error}=await q;
+        if(!error && data) return data;
+      }catch(e){ console.warn('select err',e); }
+    }
+    // local fallback
+    let rows=this._lsAll(table);
+    for(const k in filters) rows=rows.filter(r=>String(r[k])===String(filters[k]));
+    if(gte&&col) rows=rows.filter(r=>r[col]>=gte);
+    if(lte&&col) rows=rows.filter(r=>r[col]<=lte);
+    return rows;
+  },
+  async upsertSetting(key,value){
+    settings[key]=value; LS.set(key,value);
+    if(this.ready){
+      try{ await this.client.from('settings').upsert({key,value:String(value)}); }catch(e){}
+    }
+  },
+  async saveProfile(p){
+    LS.set('patient_profile',p);
+    if(this.ready){
+      try{ await this.client.from('patient_profile').upsert(Object.assign({id:1},p)); }catch(e){}
+    }
+  }
+};
+function loadScript(src){
+  return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src;
+    s.onload=res; s.onerror=rej; document.head.appendChild(s); });
+}
+
+/* Central audit logger — writes action_log + returns row */
+async function logAction(action_type, action_detail, status='done', extra={}){
+  const row = {
+    id:uid(), log_date:todayISO(), logged_at:nowStamp(),
+    nurse_name:nurse||'(unknown)', action_type, action_detail, status, ...extra
+  };
+  await DB.insert('action_log', row);
+  return row;
+}
+
+/* =========================================================================
+   MEDICATION SCHEDULE (date-aware source of truth)
+   ========================================================================= */
+const NEB='nebulizer', NGT='ngt', CARE='care', EYE='eye', ORAL='oral';
+const DAILY_SCHEDULE = [
+  { time:'06:00', items:[
+    {id:'neb-nacl-0600', ic:'💨', name:'Nebulizer — Sodium Chloride 0.9% (3ml)', type:NEB},
+  ]},
+  { time:'07:00', items:[
+    {id:'bath', ic:'🛁', name:'Bath', type:CARE},
+    {id:'pos-0700', ic:'🔄', name:'Change Position', type:CARE},
+  ]},
+  { time:'08:00', items:[
+    {id:'neb-ipra-0800', ic:'💨', name:'Nebulizer — Ipratropium 250mcg (2ml)', type:NEB},
+    {id:'chx-0800', ic:'🪥', name:'Chlorhexidine Mouth Wash 0.2% — 15ml', type:ORAL},
+    {id:'lansoprazole', ic:'💊', name:'Lansoprazole 30mg (10ml) — NGT', type:NGT},
+    {id:'levetiracetam-am', ic:'💊', name:'Levetiracetam 750mg (7.5ml) — NGT', type:NGT},
+    {id:'clopidogrel', ic:'💊', name:'Clopidogrel (Plavix) 75mg — NGT', type:NGT},
+    {id:'linagliptin', ic:'💊', name:'Linagliptin 5mg — NGT', type:NGT},
+    {id:'eye-0800', ic:'👁️', name:'Eye Lubricant — Both Eyes, 1 drop each', type:EYE},
+    {id:'movicol-am', ic:'💊', name:'Polyethylene Glycol / Movicol 13.8gm — NGT', type:NGT},
+    {id:'senna', ic:'💊', name:'Senna 2 tabs — NGT', type:NGT},
+    {id:'simethicone-0800', ic:'💊', name:'Simethicone 40mg (1ml) — NGT', type:NGT},
+  ]},
+  { time:'12:00', items:[
+    {id:'pos-1200', ic:'🔄', name:'Change Position', type:CARE},
+    {id:'neb-nacl-1200', ic:'💨', name:'Nebulizer — Sodium Chloride 0.9% (3ml)', type:NEB},
+  ]},
+  { time:'13:00', items:[
+    {id:'neb-ipra-1300', ic:'💨', name:'Nebulizer — Ipratropium 250mcg (2ml)', type:NEB},
+    {id:'eye-1300', ic:'👁️', name:'Eye Lubricant — Both Eyes, 1 drop each', type:EYE},
+    {id:'simethicone-1300', ic:'💊', name:'Simethicone 40mg (1ml) — NGT', type:NGT},
+  ]},
+  { time:'16:00', items:[
+    {id:'pos-1600', ic:'🔄', name:'Change Position', type:CARE},
+  ]},
+  { time:'18:00', items:[
+    {id:'neb-nacl-1800', ic:'💨', name:'Nebulizer — Sodium Chloride 0.9% (3ml)', type:NEB},
+  ]},
+  { time:'20:00', items:[
+    {id:'pos-2000', ic:'🔄', name:'Change Position', type:CARE},
+    {id:'neb-ipra-2000', ic:'💨', name:'Nebulizer — Ipratropium 250mcg (2ml)', type:NEB},
+    {id:'chx-2000', ic:'🪥', name:'Chlorhexidine Mouth Wash 0.2% — 15ml', type:ORAL},
+    {id:'levetiracetam-pm', ic:'💊', name:'Levetiracetam 750mg (7.5ml) — NGT', type:NGT},
+    {id:'clonazepam', ic:'💊', name:'Clonazepam 0.5mg — NGT (Bedtime)', type:NGT},
+    {id:'eye-2000', ic:'👁️', name:'Eye Lubricant — Both Eyes, 1 drop each', type:EYE},
+    {id:'movicol-pm', ic:'💊', name:'Polyethylene Glycol / Movicol 13.8gm — NGT', type:NGT},
+    {id:'simethicone-2000', ic:'💊', name:'Simethicone 40mg (1ml) — NGT', type:NGT},
+  ]},
+  { time:'00:00', items:[
+    {id:'neb-nacl-0000', ic:'💨', name:'Nebulizer — Sodium Chloride 0.9% (3ml)', type:NEB},
+    {id:'pos-0000', ic:'🔄', name:'Change Position', type:CARE},
+  ]},
+  { time:'04:00', items:[
+    {id:'pos-0400', ic:'🔄', name:'Change Position', type:CARE},
+  ]},
+];
+
+/* Active-medication list for the emergency card */
+const ACTIVE_MEDS = [
+  'Lansoprazole 30mg — NGT (08:00)',
+  'Levetiracetam 750mg — NGT (08:00 & 20:00)',
+  'Clopidogrel (Plavix) 75mg — NGT (08:00)',
+  'Linagliptin 5mg — NGT (08:00)',
+  'Movicol / PEG 13.8gm — NGT (08:00 & 20:00)',
+  'Senna 2 tabs — NGT (08:00)',
+  'Simethicone 40mg — NGT (08:00, 13:00, 20:00)',
+  'Clonazepam 0.5mg — NGT (20:00, bedtime)',
+  'Cholecalciferol (Vit D3) 50,000 IU — NGT (monthly)',
+  'Ipratropium & Sodium Chloride nebulizers',
+  'Bisacodyl 10mg suppository — PRN',
+];
+
+/* date helpers for schedule */
+function isSunday(d=new Date()){ return d.getDay()===0; }
+function nextSunday(from=new Date()){
+  const d=new Date(from); d.setHours(0,0,0,0);
+  const add=(7-d.getDay())%7; d.setDate(d.getDate()+(add===0?0:add)); return d;
+}
+function vitDNextDose(from=new Date()){
+  const base=new Date(FIXED.vitd_base+'T00:00:00');
+  const day=new Date(from); day.setHours(0,0,0,0);
+  let due=new Date(base);
+  while(due<day) due.setDate(due.getDate()+30);
+  return due;
+}
+function daysUntil(dateObj){
+  const a=new Date(); a.setHours(0,0,0,0);
+  const b=new Date(dateObj); b.setHours(0,0,0,0);
+  return Math.round((b-a)/86400000);
+}
+function fmtDate(d){ return new Date(d).toLocaleDateString(lang==='ar'?'ar-EG':'en-GB',
+  {day:'numeric',month:'short',year:'numeric'}); }
+
+/* =========================================================================
+   FEEDING PROTOCOL
+   ========================================================================= */
+const FEED_STEPS = [
+  {n:1, ic:'🍼', title:'Place 150ml feed', desc:'Set timer to exactly 1 hour', kind:'food', ml:150, timer:60},
+  {n:2, ic:'💉', title:'Flush tube', desc:'Flush after feed completes', kind:'flush', timer:0},
+  {n:3, ic:'😴', title:'Rest 1 hour', desc:'No input during this time', kind:'rest', timer:60},
+  {n:4, ic:'💧', title:'Place 200ml water', desc:'Set flow to exactly 1 hour', kind:'water', ml:200, timer:60},
+  {n:5, ic:'😴', title:'Rest 1 hour', desc:'No input during this time', kind:'rest', timer:60},
+];
+function feedingTimes(){
+  const {h,m}=parseHM(settings.feeding_start_time);
+  const out=[]; for(let i=0;i<6;i++){ const hh=(h+i*4)%24; out.push(`${pad(hh)}:${pad(m)}`); }
+  return out;
+}
+/* per-day session progress stored locally, keyed by date */
+function sessionsKey(d=todayISO()){ return 'sessions_'+d; }
+function loadSessions(){
+  let s=LS.get(sessionsKey(),null);
+  if(!s){
+    const times=feedingTimes();
+    s=times.map((tm,i)=>({num:i+1, scheduled_time:tm, nurse_name:'',
+      step1_done_at:null,step2_done_at:null,step3_done_at:null,step4_done_at:null,step5_done_at:null}));
+    LS.set(sessionsKey(),s);
+  }
+  return s;
+}
+function saveSessions(s){ LS.set(sessionsKey(),s); }
+
+/* medication done state (local), keyed by date+itemId */
+function medDoneKey(d=todayISO()){ return 'meddone_'+d; }
+function loadMedDone(d=todayISO()){ return LS.get(medDoneKey(d),{}); }
+function saveMedDone(obj,d=todayISO()){ LS.set(medDoneKey(d),obj); }
+
+/* =========================================================================
+   ROUTER / TABS
+   ========================================================================= */
+let currentTab='patient';
+function show(tab){
+  if(tab==='admin' && !adminUnlocked){ promptAdmin(); return; }
+  currentTab=tab;
+  $$('#tabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  $$('[data-view]').forEach(v=>v.classList.toggle('hidden', v.dataset.view!==tab));
+  renderTab(tab);
+  window.scrollTo(0,0);
+}
+function renderTab(tab){
+  if(tab==='patient') renderPatient();
+  else if(tab==='today') renderToday();
+  else if(tab==='meds') renderMeds();
+  else if(tab==='report') renderReport();
+  else if(tab==='admin') renderAdmin();
+}
+
+/* =========================================================================
+   TAB 1 — PATIENT PROFILE + EMERGENCY CARD
+   ========================================================================= */
+function renderPatient(){
+  const v=$('[data-view="patient"]'); v.innerHTML='';
+  // Profile form
+  const form=el('div',{class:'card'},[
+    el('h2',{text:'🧑‍⚕️ Patient Profile'}),
+    field('Full Name','name','text'),
+    el('div',{class:'row'},[ field('National / Qatar ID','national_id','text'),
+                             field('HC Number','hc_number','text') ]),
+    el('div',{class:'row'},[ field('Date of Birth','dob','date'),
+                             selectField('Gender','gender',['','Male','Female']) ]),
+    field('Address','address','text'),
+    el('button',{class:'btn',onClick:saveProfileForm},'💾 Save Profile'),
+  ]);
+  v.appendChild(form);
+  // fill values
+  ['name','national_id','hc_number','dob','gender','address'].forEach(k=>{
+    const inp=$('#pf_'+k); if(inp) inp.value=profile[k]||'';
+  });
+
+  // Emergency card
+  v.appendChild(emergencyCard());
+
+  function field(label,key,type){
+    return el('div',{},[ el('label',{text:label}),
+      el('input',{id:'pf_'+key, type, 'data-key':key}) ]);
+  }
+  function selectField(label,key,opts){
+    const s=el('select',{id:'pf_'+key,'data-key':key},
+      opts.map(o=>el('option',{value:o},o||'—')));
+    return el('div',{},[ el('label',{text:label}), s ]);
+  }
+}
+function saveProfileForm(){
+  ['name','national_id','hc_number','dob','gender','address'].forEach(k=>{
+    const inp=$('#pf_'+k); if(inp) profile[k]=inp.value.trim();
+  });
+  DB.saveProfile(profile);
+  toast(t('saved'),'ok');
+  renderPatient();
+}
+function emergencyCard(){
+  const p=profile;
+  const wrap=el('div',{class:'card',id:'emg-card'},[
+    el('div',{class:'ecard'},[
+      el('div',{class:'ehead'},[ el('span',{text:'🚨 EMERGENCY CARD'}),
+        el('span',{style:'font-size:.8rem',text:'Hamad Medical Corp.'}) ]),
+      el('div',{class:'ebody'},[
+        el('div',{class:'kv'},[el('span',{class:'k',text:'Name'}),el('span',{class:'v',text:p.name||'—'})]),
+        el('div',{class:'kv'},[el('span',{class:'k',text:'ID'}),el('span',{class:'v',text:p.national_id||'—'})]),
+        el('div',{class:'kv'},[el('span',{class:'k',text:'HC No.'}),el('span',{class:'v',text:p.hc_number||'—'})]),
+        el('div',{class:'kv'},[el('span',{class:'k',text:'DOB'}),el('span',{class:'v',text:p.dob||'—'})]),
+        el('div',{class:'kv'},[el('span',{class:'k',text:'Hospital'}),el('span',{class:'v',text:'HMC — RH Rumailah'})]),
+        el('h3',{style:'margin-top:.8rem',text:'⚕️ Diagnosis Summary'}),
+        el('ul',{class:'dx'},[
+          li('Tube-fed patient (NGT)'), li('T-Tube present'),
+          li('Seizure disorder — on Levetiracetam'),
+          li('Diabetic — on Linagliptin'),
+          li('On anticoagulant — Clopidogrel (bleeding risk)'),
+          li('Sedated at night — Clonazepam'),
+        ]),
+        el('h3',{style:'margin-top:.8rem',text:'💊 Active Medications'}),
+        el('ul',{class:'dx',style:'list-style:none'},
+          ACTIVE_MEDS.map(m=>el('li',{style:'font-weight:600',text:m}))),
+        el('div',{class:'ecall',text:'IN CASE OF EMERGENCY CALL 999'}),
+      ])
+    ]),
+    el('button',{class:'btn red no-print',style:'margin-top:.8rem',onClick:printEmergency},'🖨️ Print Emergency Card'),
+  ]);
+  function li(x){ return el('li',{text:x}); }
+  return wrap;
+}
+function printEmergency(){
+  const html=$('#emg-card .ecard').outerHTML;
+  printWindow('Emergency Card — '+(profile.name||''), `
+    <style>
+      body{font-family:Arial,sans-serif;padding:16px;color:#0f172a}
+      .ecard{border:3px solid #dc2626;border-radius:14px;overflow:hidden}
+      .ehead{background:#dc2626;color:#fff;padding:10px 14px;font-weight:900;font-size:20px;display:flex;justify-content:space-between}
+      .ebody{padding:16px}
+      .kv{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #ccc}
+      .k{color:#555} .v{font-weight:700}
+      .dx{padding-left:0} .dx li{list-style:none;padding:4px 0;border-bottom:1px dashed #ddd;font-weight:600}
+      .ecall{background:#dc2626;color:#fff;text-align:center;font-weight:900;font-size:22px;padding:14px;border-radius:10px;margin-top:14px}
+      h3{margin:14px 0 4px}
+    </style>${html}`);
+}
+
+/* =========================================================================
+   TAB 2 — TODAY (Feeding protocol)
+   ========================================================================= */
+let openSession=null;
+function renderToday(){
+  const v=$('[data-view="today"]'); v.innerHTML='';
+  const sessions=loadSessions();
+
+  // progress
+  let food=0, water=0;
+  sessions.forEach(s=>{ if(s.step1_done_at)food+=150; if(s.step4_done_at)water+=200; });
+  const foodTarget=900, waterTarget=1000;
+
+  v.appendChild(el('div',{class:'card'},[
+    el('h2',{text:'🍼 Tube Feeding — Today'}),
+    el('p',{class:'muted',style:'margin:.2rem 0 .8rem',
+      text:`6 sessions · every 4h · start ${settings.feeding_start_time}`}),
+    progressBar('food','🍼 Food',food,foodTarget,'ml'),
+    el('div',{class:'sp'}),
+    progressBar('water','💧 Water',water,waterTarget,'ml'),
+  ]));
+
+  const times=feedingTimes();
+  // find active session = first not fully complete
+  let activeIdx=sessions.findIndex(s=>!s.step5_done_at);
+  if(activeIdx<0) activeIdx=sessions.length-1;
+  if(openSession==null) openSession=activeIdx;
+
+  sessions.forEach((s,i)=>{
+    const complete=!!s.step5_done_at;
+    const isActive=i===activeIdx && !complete;
+    const card=el('div',{class:'session'+(isActive?' active':'')+(complete?' done':'')});
+    const head=el('div',{class:'session-head',onClick:()=>{ openSession=openSession===i?-1:i; renderToday(); }},[
+      el('span',{class:'num',text:complete?'✓':String(i+1)}),
+      el('span',{class:'t',text:`Session ${i+1}`}),
+      el('span',{class:'muted',style:'font-size:.85rem',text:'· '+s.scheduled_time}),
+      el('span',{class:'meta'}, complete?el('span',{class:'pill green',text:'DONE'})
+        : isActive?el('span',{class:'pill amber',text:'ACTIVE'}):el('span',{class:'pill gray',text:'—'})),
+    ]);
+    card.appendChild(head);
+    if(openSession===i){
+      const steps=el('div',{class:'steps'});
+      FEED_STEPS.forEach(step=>{
+        const doneAt=s['step'+step.n+'_done_at'];
+        const prevDone= step.n===1 ? true : !!s['step'+(step.n-1)+'_done_at'];
+        const locked=!doneAt && !prevDone;
+        const row=el('div',{class:'step'+(locked?' locked':'')},[
+          el('span',{class:'sic',text:step.ic}),
+          el('div',{class:'sbody'},[
+            el('div',{class:'stitle',text:`${step.n}. ${step.title}`}),
+            el('div',{class:'sdesc',text:step.desc}),
+            doneAt? el('div',{class:'sstamp',text:`✓ ${timeHM(doneAt)} · ${s.nurse_name||''}`}) : null,
+            (step.timer>0 && doneAt && !s['step'+(step.n+1)+'_done_at'])
+              ? el('div',{class:'timer','data-timer':doneAt,'data-mins':step.timer}) : null,
+          ]),
+          el('button',{class:'stepbtn'+(doneAt?' done':''), disabled: doneAt||locked?'':null,
+            onClick:()=>completeStep(i,step)}, doneAt?'✓':'Done'),
+        ]);
+        steps.appendChild(row);
+      });
+      card.appendChild(steps);
+    }
+    v.appendChild(card);
+  });
+
+  startTimers();
+
+  function progressBar(cls,label,val,target,unit){
+    const pct=Math.min(100, Math.round(val/target*100));
+    return el('div',{},[
+      el('div',{class:'prog-label'},[ el('span',{text:label}),
+        el('span',{text:`${val} / ${target} ${unit}`}) ]),
+      el('div',{class:'prog '+cls},[ el('i',{style:`width:${pct}%`}) ]),
+    ]);
+  }
+}
+async function completeStep(sessIdx, step){
+  if(!requireNurse()) return;
+  const sessions=loadSessions();
+  const s=sessions[sessIdx];
+  // enforce order
+  if(step.n>1 && !s['step'+(step.n-1)+'_done_at']){ toast('Complete the previous step first','err'); return; }
+  if(s['step'+step.n+'_done_at']) return;
+  s['step'+step.n+'_done_at']=nowStamp();
+  s.nurse_name=nurse;
+  saveSessions(sessions);
+
+  // persist full session row + audit
+  await DB.insert('sessions', {
+    id:uid(), session_date:todayISO(), session_number:s.num, scheduled_time:s.scheduled_time,
+    nurse_name:nurse,
+    step1_done_at:s.step1_done_at,step2_done_at:s.step2_done_at,step3_done_at:s.step3_done_at,
+    step4_done_at:s.step4_done_at,step5_done_at:s.step5_done_at,
+  });
+  await logAction('feeding', `Session ${s.num} · Step ${step.n}: ${step.title}`, 'done');
+
+  toast(`${step.ic} ${step.title} — ${t('logged')}`,'ok');
+  renderToday();
+}
+/* live countdown timers for feeding steps */
+let timerInt=null;
+function startTimers(){
+  if(timerInt) clearInterval(timerInt);
+  const tick=()=>{
+    $$('.timer[data-timer]').forEach(node=>{
+      const start=new Date(node.dataset.timer).getTime();
+      const mins=Number(node.dataset.mins);
+      const end=start+mins*60000;
+      const left=end-Date.now();
+      if(left<=0){ node.textContent='⏱️ Timer complete — proceed'; node.style.color='var(--green)'; return; }
+      const m=Math.floor(left/60000), sec=Math.floor((left%60000)/1000);
+      node.textContent=`⏱️ ${pad(m)}:${pad(sec)} remaining`;
+    });
+  };
+  tick(); timerInt=setInterval(tick,1000);
+}
+
+/* =========================================================================
+   TAB 3 — MEDICATIONS
+   ========================================================================= */
+async function renderMeds(){
+  const v=$('[data-view="meds"]'); v.innerHTML='';
+  const done=loadMedDone();
+  const now=new Date();
+
+  // Warning banner
+  v.appendChild(el('div',{class:'banner warn',html:
+    '⚠️ CRUSH ALL MEDICATIONS VERY THOROUGHLY — EXTREMELY FINE — before giving via NGT'}));
+
+  // Suppository / PRN section
+  v.appendChild(await suppositoryCard());
+
+  // Upcoming reminders (pinned)
+  v.appendChild(remindersCard());
+
+  // Missed-from-yesterday note (based on yesterday's saved med-done state)
+  const missed=missedYesterday();
+  if(missed.length){
+    v.appendChild(el('div',{class:'card'},[
+      el('h3',{text:'⛔ Missed Yesterday'}),
+      el('div',{}, missed.slice(0,8).map(m=>el('div',{class:'item missed'},[
+        el('span',{class:'pill red',text:'MISSED'}),
+        el('span',{style:'margin-inline-start:.4rem',text:m.name}),
+      ]))),
+      missed.length>8?el('p',{class:'muted',text:`+${missed.length-8} more`}):null,
+    ]));
+  }
+
+  // Daily checklist by slot
+  const listCard=el('div',{class:'card'},[ el('h2',{text:'📋 Today · '+fmtDate(now)}) ]);
+  DAILY_SCHEDULE.forEach(slot=>{
+    listCard.appendChild(el('div',{class:'slot-time',text:'🕒 '+slot.time}));
+    slot.items.forEach(it=> listCard.appendChild(medItem(it, slot.time, done)));
+  });
+
+  // Sunday-only
+  if(isSunday(now)){
+    listCard.appendChild(el('div',{class:'slot-time',style:'background:#7c3aed',text:'🩸 Sunday Only'}));
+    listCard.appendChild(medItem(
+      {id:'bg-sunday', ic:'🩸', name:'Blood Glucose Check — log reading', type:'vital', vital:true},
+      '09:00', done));
+  }
+
+  // Monthly Vitamin D — only on due date
+  const vitDue=vitDNextDose(now);
+  if(daysUntil(vitDue)===0){
+    listCard.appendChild(el('div',{class:'slot-time',style:'background:#be123c',text:'💊 Monthly Dose — DUE TODAY'}));
+    listCard.appendChild(medItem(
+      {id:'vitd', ic:'💊', name:'Cholecalciferol (Vit D3) 50,000 IU — NGT', type:NGT}, '08:00', done));
+  }
+  v.appendChild(listCard);
+
+  startTimers(); // (no timers here but keeps timer nodes fresh if any)
+}
+
+function medItem(it, slotTime, done){
+  const st=done[it.id]||{};
+  const isDone=!!st.given_at;
+  const isNGT=it.type===NGT;
+  const row=el('div',{class:'item'+(isDone?' done':'')});
+  const chk=el('div',{class:'chk',text:isDone?'✓':'',onClick:()=>toggleMed(it,slotTime)});
+  const body=el('div',{class:'ibody'},[
+    el('div',{class:'iname',text:it.ic+' '+it.name}),
+    isDone? el('div',{class:'istamp',text:`✓ ${timeHM(st.given_at)} · ${st.nurse||''}`})
+          : el('div',{class:'isub',text:it.type===NGT?'Give via NGT — crush first':it.type}),
+  ]);
+  if(isNGT){
+    const sub=el('div',{class:'subchk'},[
+      subBox('Crushed thoroughly', st.crushed, (c)=>updateSub(it.id,'crushed',c)),
+      subBox('Flush done after', st.flush, (c)=>updateSub(it.id,'flush',c)),
+    ]);
+    body.appendChild(sub);
+  }
+  row.appendChild(chk); row.appendChild(body);
+  return row;
+
+  function subBox(label,checked,cb){
+    const inp=el('input',{type:'checkbox',onChange:e=>cb(e.target.checked)});
+    inp.checked=!!checked;
+    return el('label',{},[inp, document.createTextNode(' '+label)]);
+  }
+}
+function updateSub(itemId, key, val){
+  const done=loadMedDone(); done[itemId]=done[itemId]||{}; done[itemId][key]=val;
+  saveMedDone(done);
+}
+async function toggleMed(it, slotTime){
+  if(!requireNurse()) return;
+  const done=loadMedDone();
+  const st=done[it.id]||{};
+  if(st.given_at){ // undo
+    delete done[it.id]; saveMedDone(done); renderMeds();
+    toast('Unchecked','info'); return;
+  }
+  // vital: prompt for reading
+  let vitalVal=null;
+  if(it.vital){
+    vitalVal=prompt('Enter blood glucose reading (mmol/L or mg/dL):','');
+    if(vitalVal===null) return;
+  }
+  const isNGT=it.type===NGT;
+  st.given_at=nowStamp(); st.nurse=nurse;
+  if(isNGT){ st.crushed = st.crushed!==false; st.flush = st.flush!==false; } // default assumed if not toggled off
+  done[it.id]=st; saveMedDone(done);
+
+  // persist
+  if(it.vital){
+    await DB.insert('vitals_log',{id:uid(),log_date:todayISO(),logged_at:nowStamp(),nurse_name:nurse,
+      bp:'',pulse:'',temp:'',o2_sat:'',blood_glucose:vitalVal||'',notes:it.name});
+    await logAction('vital', `${it.name}: ${vitalVal}`, 'done');
+  }else{
+    await DB.insert('medications_log',{id:uid(),log_date:todayISO(),slot_time:slotTime,med_name:it.name,
+      nurse_name:nurse, crushed_confirmed:isNGT?!!st.crushed:null, flush_done:isNGT?!!st.flush:null,
+      given_at:st.given_at, skipped:false, skip_reason:''});
+    await logAction('medication', `${slotTime} · ${it.name}`, 'done');
+  }
+  toast(`${it.ic} ${t('done')}`,'ok');
+  renderMeds();
+}
+
+async function suppositoryCard(){
+  // check last BM/suppository
+  const rows=await DB.select('suppository_log');
+  const last=rows.sort((a,b)=>(b.given_at||'').localeCompare(a.given_at||''))[0];
+  const hoursSince = last? (Date.now()-new Date(last.given_at).getTime())/3600000 : Infinity;
+  const overdue = hoursSince>=48;
+  const card=el('div',{class:'card'},[
+    el('div',{class:'acc-head'},[ el('span',{text:'💊 Suppository'}), el('span',{class:'pill amber',text:'PRN ONLY'}) ]),
+    el('p',{class:'muted',style:'margin:.1rem 0 .5rem',
+      text:'Bisacodyl 10mg — Per rectum. NOT daily, NOT every other day. Only when needed.'}),
+    overdue? el('div',{class:'banner amber',style:'margin:.4rem 0',
+      html:'🔴 No BM logged in the last 48 hrs — consider suppository / review.'}) : null,
+    last? el('p',{class:'muted',text:`Last given: ${fmtDate(last.given_at)} ${timeHM(last.given_at)} · ${last.nurse_name||''}`})
+        : el('p',{class:'muted',text:'No suppository logged yet.'}),
+    el('div',{class:'row'},[
+      el('button',{class:'btn red',onClick:giveSuppository},'💊 Give Suppository Now'),
+      el('button',{class:'btn sec',onClick:logBM},'✅ Log Bowel Movement'),
+    ]),
+  ]);
+  return card;
+}
+async function giveSuppository(){
+  if(!requireNurse()) return;
+  const notes=prompt('Notes (optional):','')||'';
+  await DB.insert('suppository_log',{id:uid(),given_date:todayISO(),given_at:nowStamp(),nurse_name:nurse,notes});
+  await logAction('suppository','Bisacodyl 10mg suppository given (PRN)','done');
+  toast('💊 Suppository logged','ok'); renderMeds();
+}
+async function logBM(){
+  if(!requireNurse()) return;
+  // record as a suppository_log-style BM marker in action_log + vitals notes to reset 48h clock
+  await DB.insert('suppository_log',{id:uid(),given_date:todayISO(),given_at:nowStamp(),nurse_name:nurse,notes:'BM logged (no suppository)'});
+  await logAction('bowel','Bowel movement logged','done');
+  toast('✅ BM logged — 48h timer reset','ok'); renderMeds();
+}
+
+function remindersCard(){
+  const now=new Date();
+  const items=[
+    {ic:'🩹', label:'NGT Change', date:new Date(FIXED.ngt_change)},
+    {ic:'🔧', label:'T-Tube Change', date:new Date(FIXED.ttube_change)},
+    {ic:'💊', label:'Vitamin D next dose', date:vitDNextDose(now)},
+    {ic:'🩸', label:'Blood Glucose', date:nextSunday(now)},
+  ];
+  return el('div',{class:'card',style:'border:2px solid var(--teal)'},[
+    el('div',{class:'acc-head'},[ el('span',{text:'📌 Upcoming Reminders'}) ]),
+    el('div',{}, items.map(it=>{
+      const d=daysUntil(it.date);
+      const label = d<=0?'Today':(d===1?'1 day':d+' days');
+      return el('div',{class:'rem'},[
+        el('span',{class:'ric',text:it.ic}),
+        el('div',{class:'rt'},[ document.createTextNode(it.label),
+          el('div',{class:'muted',style:'font-weight:500;font-size:.75rem',text:fmtDate(it.date)}) ]),
+        el('span',{class:'rc'+(d<=3?' soon':''),text:label}),
+      ]);
+    })),
+  ]);
+}
+function missedYesterday(){
+  const y=new Date(); y.setDate(y.getDate()-1);
+  const yISO=todayISO(y);
+  const done=loadMedDone(yISO);
+  // only compute if there was any activity that day (avoid false "missed" on fresh installs)
+  if(Object.keys(LS.get(medDoneKey(yISO),{})).length===0 && !LS.get('activity_'+yISO,false)) return [];
+  const missed=[];
+  DAILY_SCHEDULE.forEach(slot=>slot.items.forEach(it=>{
+    if(!(done[it.id]&&done[it.id].given_at)) missed.push(it);
+  }));
+  return missed;
+}
+
+/* =========================================================================
+   TAB 4 — REPORT (caregiver)
+   ========================================================================= */
+async function renderReport(){
+  const v=$('[data-view="report"]'); v.innerHTML='';
+  const d=todayISO();
+  const actions=(await DB.select('action_log',{filters:{log_date:d}}))
+    .sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+  const sessions=loadSessions();
+  let food=0,water=0,sessDone=0;
+  sessions.forEach(s=>{ if(s.step1_done_at)food+=150; if(s.step4_done_at)water+=200; if(s.step5_done_at)sessDone++; });
+  const meds=actions.filter(a=>a.action_type==='medication').length;
+
+  v.appendChild(el('div',{class:'card',id:'report-scope'},[
+    el('h2',{text:'📋 Daily Report'}),
+    el('p',{class:'muted',text:`${profile.name||'Patient'} · ${fmtDate(new Date())} · Nurse: ${nurse||'—'}`}),
+    el('div',{class:'counters'},[
+      counter(sessDone+'/6','Sessions'), counter(food+'ml','Food'),
+      counter(water+'ml','Water'), counter(String(meds),'Meds'),
+    ]),
+    el('h3',{style:'margin-top:.8rem',text:'Activity Log'}),
+    actions.length? timeline(actions) : el('p',{class:'muted',text:'No actions logged yet today.'}),
+  ]));
+  v.appendChild(el('button',{class:'btn no-print',onClick:printReport},'🖨️ Print / Export Report'));
+
+  function counter(n,l){ return el('div',{class:'counter'},[el('div',{class:'n',text:n}),el('div',{class:'l',text:l})]); }
+}
+function timeline(actions){
+  return el('div',{class:'tl'}, actions.map(a=>{
+    const cls=a.status==='missed'?'red':a.status==='pending'?'amber':'green';
+    return el('div',{class:'tl-item'},[
+      el('span',{class:'tl-time',text:timeHM(a.logged_at)}),
+      el('span',{class:'tl-dot '+cls}),
+      el('div',{class:'tl-body'},[
+        el('div',{class:'a',text:a.action_detail}),
+        el('div',{class:'d',text:`${a.action_type} · ${a.nurse_name}`}),
+      ]),
+    ]);
+  }));
+}
+function printReport(){
+  const html=$('#report-scope').outerHTML;
+  printWindow('Daily Report — '+(profile.name||''),
+    `<style>body{font-family:Arial;padding:16px}.counters{display:flex;gap:8px;margin:10px 0}
+     .counter{border:1px solid #ccc;border-radius:8px;padding:8px;text-align:center;flex:1}
+     .counter .n{font-size:20px;font-weight:800}.counter .l{font-size:11px;color:#666}
+     .tl-item{display:flex;gap:8px;padding:5px 0;border-top:1px solid #eee}
+     .tl-time{width:56px;font-weight:700}.tl-dot{display:none}
+     .a{font-weight:700}.d{font-size:12px;color:#666}h2,h3{margin:6px 0}</style>`+html);
+}
+
+/* =========================================================================
+   TAB 5 — ADMIN
+   ========================================================================= */
+let adminUnlocked=false;
+async function promptAdmin(){
+  // if no password set, force setting one
+  if(!settings.admin_password_hash){
+    openModal('Set Admin Password', [
+      el('p',{class:'muted',text:'No admin password set yet. Create one to protect the dashboard.'}),
+      el('label',{text:'New password'}), el('input',{id:'m_pw1',type:'password'}),
+      el('label',{text:'Confirm password'}), el('input',{id:'m_pw2',type:'password'}),
+    ], async ()=>{
+      const a=$('#m_pw1').value, b=$('#m_pw2').value;
+      if(!a||a!==b){ toast('Passwords do not match','err'); return false; }
+      await DB.upsertSetting('admin_password_hash', await sha256(a));
+      adminUnlocked=true; closeModal(); show('admin'); toast('Password set','ok'); return true;
+    });
+    return;
+  }
+  openModal('Admin Login', [
+    el('label',{text:'Enter admin password'}),
+    el('input',{id:'m_pw',type:'password', onKeydown:e=>{ if(e.key==='Enter') $('#modalOk').click(); }}),
+  ], async ()=>{
+    const h=await sha256($('#m_pw').value);
+    if(h===settings.admin_password_hash){ adminUnlocked=true; closeModal(); show('admin'); return true; }
+    toast('Wrong password','err'); return false;
+  });
+}
+let adminDate=todayISO();
+async function renderAdmin(){
+  const v=$('[data-view="admin"]'); v.innerHTML='';
+  // Today overview
+  v.appendChild(el('div',{class:'card'},[
+    el('h2',{text:'🔐 Admin Dashboard'}),
+    el('p',{class:'muted',text:'Full audit trail · '+fmtDate(new Date())}),
+  ]));
+
+  await renderAdminDay(v, todayISO(), 'Today’s Overview');
+
+  // History browser
+  const histCard=el('div',{class:'card'},[
+    el('h3',{text:'🗓️ History Browser'}),
+    el('div',{class:'row'},[
+      el('div',{},[ el('label',{text:'From date'}), el('input',{id:'adm_from',type:'date',value:todayISO()}) ]),
+      el('div',{},[ el('label',{text:'To date'}), el('input',{id:'adm_to',type:'date',value:todayISO()}) ]),
+    ]),
+    el('div',{class:'row'},[
+      el('div',{},[ el('label',{text:'Caregiver'}), el('input',{id:'adm_nurse',type:'text',placeholder:'any'}) ]),
+      el('div',{},[ el('label',{text:'Action type'}),
+        el('select',{id:'adm_type'},['any','feeding','medication','suppository','vital','bowel','care']
+          .map(o=>el('option',{value:o},o))) ]),
+    ]),
+    el('div',{class:'row'},[
+      el('button',{class:'btn sm',onClick:runHistory},'🔍 Load'),
+      el('button',{class:'btn sm sec',onClick:exportCSV},'⬇️ CSV'),
+      el('button',{class:'btn sm gray',onClick:printHistory},'🖨️ Print'),
+    ]),
+    el('div',{id:'histResult'}),
+  ]);
+  v.appendChild(histCard);
+
+  // Caregiver activity
+  v.appendChild(el('div',{class:'card',id:'caregiverCard'},[ el('h3',{text:'👥 Caregiver Activity'}),
+    el('div',{id:'cgBody',class:'muted',text:'Load a range above to compute per-caregiver totals.'}) ]));
+
+  // Settings
+  v.appendChild(adminSettings());
+}
+async function renderAdminDay(container, dateISO, title){
+  const actions=(await DB.select('action_log',{filters:{log_date:dateISO}}))
+    .sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+  const done=actions.filter(a=>a.status==='done').length;
+  const missed=actions.filter(a=>a.status==='missed').length;
+  const pending=actions.filter(a=>a.status==='pending').length;
+  container.appendChild(el('div',{class:'card'},[
+    el('h3',{text:'📆 '+title}),
+    el('div',{class:'counters'},[
+      counter(String(actions.length),'Total'), counter(String(done),'Done'),
+      counter(String(missed),'Missed'), counter(String(pending),'Pending'),
+    ]),
+    actions.length? timeline(actions): el('p',{class:'muted',text:'No activity recorded.'}),
+  ]));
+  function counter(n,l){ return el('div',{class:'counter'},[el('div',{class:'n',text:n}),el('div',{class:'l',text:l})]); }
+}
+async function queryRange(){
+  const from=$('#adm_from').value||todayISO();
+  const to=$('#adm_to').value||todayISO();
+  const nurseF=($('#adm_nurse').value||'').trim().toLowerCase();
+  const typeF=$('#adm_type').value;
+  let rows=await DB.select('action_log',{col:'log_date',gte:from,lte:to});
+  rows=rows.filter(r=>r.log_date>=from&&r.log_date<=to);
+  if(nurseF) rows=rows.filter(r=>(r.nurse_name||'').toLowerCase().includes(nurseF));
+  if(typeF&&typeF!=='any') rows=rows.filter(r=>r.action_type===typeF);
+  rows.sort((a,b)=>(a.logged_at||'').localeCompare(b.logged_at||''));
+  return rows;
+}
+async function runHistory(){
+  const rows=await queryRange();
+  const box=$('#histResult'); box.innerHTML='';
+  if(!rows.length){ box.appendChild(el('p',{class:'muted',text:'No records for this filter.'})); }
+  else{
+    box.appendChild(el('p',{class:'muted',style:'margin-top:.6rem',text:`${rows.length} records`}));
+    box.appendChild(timeline(rows));
+  }
+  // caregiver activity
+  const byNurse={};
+  rows.forEach(r=>{ const n=r.nurse_name||'(unknown)'; byNurse[n]=(byNurse[n]||0)+1; });
+  const cg=$('#cgBody'); cg.innerHTML='';
+  const names=Object.keys(byNurse).sort((a,b)=>byNurse[b]-byNurse[a]);
+  if(!names.length) cg.textContent='No caregiver activity in range.';
+  else names.forEach(n=> cg.appendChild(el('div',{class:'kv'},[
+    el('span',{class:'k',text:'👤 '+n}), el('span',{class:'v',text:byNurse[n]+' tasks'}) ])));
+}
+async function exportCSV(){
+  const rows=await queryRange();
+  if(!rows.length){ toast('Nothing to export','err'); return; }
+  const cols=['log_date','logged_at','nurse_name','action_type','action_detail','status'];
+  const csv=[cols.join(',')].concat(rows.map(r=>cols.map(c=>
+    `"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=el('a',{href:URL.createObjectURL(blob),download:`report_${$('#adm_from').value}_${$('#adm_to').value}.csv`});
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('CSV exported','ok');
+}
+async function printHistory(){
+  const rows=await queryRange();
+  const body=rows.map(r=>`<tr><td>${r.log_date}</td><td>${timeHM(r.logged_at)}</td>
+    <td>${r.nurse_name||''}</td><td>${r.action_type}</td><td>${r.action_detail||''}</td>
+    <td>${r.status}</td></tr>`).join('');
+  printWindow('History — '+$('#adm_from').value+' → '+$('#adm_to').value,
+    `<style>body{font-family:Arial;padding:16px}table{width:100%;border-collapse:collapse;font-size:12px}
+     th,td{border:1px solid #ccc;padding:5px;text-align:left}th{background:#f1f5f9}</style>
+     <h2>${profile.name||'Patient'} — Audit Report</h2>
+     <p>${$('#adm_from').value} → ${$('#adm_to').value}</p>
+     <table><thead><tr><th>Date</th><th>Time</th><th>Nurse</th><th>Type</th><th>Detail</th><th>Status</th></tr></thead>
+     <tbody>${body||'<tr><td colspan=6>No records</td></tr>'}</tbody></table>`);
+}
+
+/* ---- Admin settings ---- */
+function adminSettings(){
+  return el('div',{class:'card'},[
+    el('h3',{text:'⚙️ Admin Settings'}),
+
+    el('div',{class:'acc-head',style:'margin-top:.6rem'},[el('span',{text:'🔑 Change Password'})]),
+    el('label',{text:'New admin password'}), el('input',{id:'set_pw1',type:'password'}),
+    el('label',{text:'Confirm'}), el('input',{id:'set_pw2',type:'password'}),
+    el('button',{class:'btn sm',style:'margin-top:.5rem',onClick:changePw},'Update Password'),
+
+    el('hr',{style:'margin:1rem 0;border:none;border-top:1px solid var(--line)'}),
+    el('div',{class:'acc-head'},[el('span',{text:'🗄️ Supabase Connection'}),
+      el('span',{id:'sbStatus',class:'pill gray',text:'…'})]),
+    el('label',{text:'Supabase URL'}), el('input',{id:'set_url',type:'url',value:settings.sb_url,placeholder:'https://xxx.supabase.co'}),
+    el('label',{text:'Supabase Anon Key'}), el('input',{id:'set_key',type:'text',value:settings.sb_key,placeholder:'eyJ...'}),
+    el('div',{class:'row',style:'margin-top:.5rem'},[
+      el('button',{class:'btn sm',onClick:saveSupabase},'💾 Save & Connect'),
+      el('button',{class:'btn sm sec',onClick:copySQL},'📋 Copy SQL Schema'),
+    ]),
+    el('details',{style:'margin-top:.6rem'},[
+      el('summary',{text:'View SQL schema'}),
+      el('pre',{class:'sql',id:'sqlBox',text:SQL_SCHEMA}),
+    ]),
+
+    el('hr',{style:'margin:1rem 0;border:none;border-top:1px solid var(--line)'}),
+    el('div',{class:'acc-head'},[el('span',{text:'🍼 Feeding Start Time'})]),
+    el('div',{class:'row'},[
+      el('div',{},[ el('input',{id:'set_start',type:'time',value:settings.feeding_start_time}) ]),
+      el('button',{class:'btn sm',onClick:saveStart},'Save'),
+    ]),
+    el('p',{class:'muted',style:'font-size:.78rem',text:'Sessions: '+feedingTimes().join(' · ')}),
+
+    el('hr',{style:'margin:1rem 0;border:none;border-top:1px solid var(--line)'}),
+    el('div',{class:'acc-head'},[el('span',{text:'🔄 Data'})]),
+    el('button',{class:'btn sm gray',onClick:()=>{ adminUnlocked=false; show('patient'); toast('Locked','info'); }},'🔒 Lock Admin'),
+  ]);
+
+}
+async function changePw(){
+  const a=$('#set_pw1').value,b=$('#set_pw2').value;
+  if(!a||a!==b){ toast('Passwords do not match','err'); return; }
+  await DB.upsertSetting('admin_password_hash', await sha256(a));
+  $('#set_pw1').value=''; $('#set_pw2').value='';
+  toast('Password updated','ok');
+}
+async function saveSupabase(){
+  await DB.upsertSetting('sb_url',$('#set_url').value.trim());
+  await DB.upsertSetting('sb_key',$('#set_key').value.trim());
+  toast('Connecting…','info');
+  const ok=await DB.init();
+  toast(ok?'✅ Connected to Supabase':'⚠️ Saved — using local (check keys)', ok?'ok':'err',3000);
+  const s=$('#sbStatus'); if(s){ s.textContent=ok?'Connected':'Local'; s.className='pill '+(ok?'green':'amber'); }
+}
+function copySQL(){
+  navigator.clipboard.writeText(SQL_SCHEMA).then(
+    ()=>toast('📋 SQL copied','ok'), ()=>{
+      const box=$('#sqlBox'); const r=document.createRange(); r.selectNode(box);
+      getSelection().removeAllRanges(); getSelection().addRange(r);
+      try{document.execCommand('copy');toast('📋 SQL copied','ok');}catch(e){toast('Copy failed','err');}
+    });
+}
+async function saveStart(){
+  const v=$('#set_start').value||'06:00';
+  await DB.upsertSetting('feeding_start_time',v);
+  // reset today's sessions to new times if none started
+  const s=loadSessions();
+  const anyStarted=s.some(x=>x.step1_done_at);
+  if(!anyStarted){ LS.set(sessionsKey(),null); LS.set(sessionsKey(),loadSessions()); }
+  toast('Feeding start updated','ok');
+  renderAdmin();
+}
+
+/* =========================================================================
+   SQL SCHEMA (shown + copyable in Admin)
+   ========================================================================= */
+const SQL_SCHEMA = `-- Patient Care PWA — Supabase schema
+create table if not exists patient_profile (
+  id bigint primary key default 1,
+  name text, national_id text, hc_number text, dob date,
+  gender text, address text, diagnosis_notes text
+);
+
+create table if not exists sessions (
+  id text primary key,
+  session_date date, session_number int, scheduled_time text, nurse_name text,
+  step1_done_at timestamptz, step2_done_at timestamptz, step3_done_at timestamptz,
+  step4_done_at timestamptz, step5_done_at timestamptz
+);
+
+create table if not exists medications_log (
+  id text primary key,
+  log_date date, slot_time text, med_name text, nurse_name text,
+  crushed_confirmed bool, flush_done bool, given_at timestamptz,
+  skipped bool default false, skip_reason text
+);
+
+create table if not exists suppository_log (
+  id text primary key,
+  given_date date, given_at timestamptz, nurse_name text, notes text
+);
+
+create table if not exists vitals_log (
+  id text primary key,
+  log_date date, logged_at timestamptz, nurse_name text,
+  bp text, pulse text, temp text, o2_sat text, blood_glucose text, notes text
+);
+
+create table if not exists action_log (
+  id text primary key,
+  log_date date, logged_at timestamptz, nurse_name text,
+  action_type text, action_detail text, status text
+);
+
+create table if not exists settings (
+  key text primary key, value text
+);
+
+-- Enable Row Level Security + permissive public policies
+alter table patient_profile enable row level security;
+alter table sessions enable row level security;
+alter table medications_log enable row level security;
+alter table suppository_log enable row level security;
+alter table vitals_log enable row level security;
+alter table action_log enable row level security;
+alter table settings enable row level security;
+
+do $$
+declare t text;
+begin
+  foreach t in array array['patient_profile','sessions','medications_log',
+    'suppository_log','vitals_log','action_log','settings']
+  loop
+    execute format('drop policy if exists public_all on %I;', t);
+    execute format('create policy public_all on %I for all using (true) with check (true);', t);
+  end loop;
+end $$;`;
+
+/* =========================================================================
+   MODAL
+   ========================================================================= */
+function openModal(title, bodyNodes, onOk){
+  closeModal();
+  const box=el('div',{class:'box'},[
+    el('h3',{text:title}),
+    el('div',{}, bodyNodes),
+    el('div',{class:'row',style:'margin-top:1rem'},[
+      el('button',{class:'btn sec',onClick:closeModal},'Cancel'),
+      el('button',{class:'btn',id:'modalOk',onClick:async()=>{ await onOk(); }},'OK'),
+    ]),
+  ]);
+  const m=el('div',{class:'modal',id:'modal',onClick:e=>{ if(e.target.id==='modal') closeModal(); }},[box]);
+  document.body.appendChild(m);
+  const first=box.querySelector('input'); if(first) first.focus();
+}
+function closeModal(){ const m=$('#modal'); if(m) m.remove(); }
+
+/* =========================================================================
+   PRINT HELPER
+   ========================================================================= */
+function printWindow(title, innerHTML){
+  const w=window.open('','_blank');
+  if(!w){ toast('Allow pop-ups to print','err'); return; }
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title></head>
+    <body onload="setTimeout(function(){window.print();},250)">${innerHTML}</body></html>`);
+  w.document.close();
+}
+
+/* =========================================================================
+   NOTIFICATIONS — schedule 30-min-before + at-time for feeds & med slots
+   ========================================================================= */
+let notifTimers=[];
+function clearNotifTimers(){ notifTimers.forEach(id=>clearTimeout(id)); notifTimers=[]; }
+function scheduleNotifications(){
+  clearNotifTimers();
+  if(!('Notification' in window) || Notification.permission!=='granted') return;
+  const now=new Date();
+  const events=[];
+  feedingTimes().forEach((hm,i)=>events.push({hm, title:'🍼 Feeding due', body:`Session ${i+1} at ${hm}`}));
+  DAILY_SCHEDULE.forEach(slot=>{
+    const names=slot.items.map(x=>x.name.split(' — ')[0]).slice(0,3).join(', ');
+    events.push({hm:slot.time, title:'💊 Medication due', body:`${slot.time}: ${names}${slot.items.length>3?'…':''}`});
+  });
+  events.forEach(ev=>{
+    const {h,m}=parseHM(ev.hm);
+    [30,0].forEach(offset=>{
+      const target=new Date(now); target.setHours(h,m-offset,0,0);
+      if(target<=now) return; // only future today
+      const delay=target-now;
+      if(delay>0 && delay<24*3600000){
+        const id=setTimeout(()=>fireNotification(
+          offset===30?`⏰ In 30 min: ${ev.title}`:ev.title,
+          ev.body), delay);
+        notifTimers.push(id);
+      }
+    });
+  });
+}
+function fireNotification(title, body){
+  const icon="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230f766e'/%3E%3C/svg%3E";
+  if(navigator.serviceWorker && navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({type:'notify',title,body,icon,tag:title});
+  }else if('Notification' in window && Notification.permission==='granted'){
+    new Notification(title,{body,icon});
+  }
+}
+async function requestNotifPermission(){
+  if(!('Notification' in window)){ toast('Notifications not supported','err'); return; }
+  if(Notification.permission==='granted'){ scheduleNotifications();
+    fireNotification('🔔 Notifications on','You’ll be reminded 30 min before & at each task.'); return; }
+  const p=await Notification.requestPermission();
+  if(p==='granted'){ toast('🔔 Notifications enabled','ok'); scheduleNotifications();
+    fireNotification('🔔 Notifications on','You’ll be reminded 30 min before & at each task.'); }
+  else toast('Notifications blocked','err');
+}
+
+/* =========================================================================
+   MISC — nurse, lang, midnight reset, requireNurse
+   ========================================================================= */
+function requireNurse(){
+  if(!nurse){ toast(t('needNurse'),'err'); $('#nurseName').focus(); return false; }
+  LS.set('activity_'+todayISO(), true);
+  return true;
+}
+function bindHeader(){
+  const ni=$('#nurseName'); ni.value=nurse;
+  ni.addEventListener('input', ()=>{ nurse=ni.value.trim(); LS.set('nurse_name',nurse); });
+  $('#langBtn').addEventListener('click', ()=>{ lang=lang==='ar'?'en':'ar'; LS.set('lang',lang);
+    applyI18n(); renderTab(currentTab); });
+  $('#notifBtn').addEventListener('click', requestNotifPermission);
+  $$('#tabs button').forEach(b=> b.addEventListener('click', ()=>show(b.dataset.tab)));
+}
+/* auto-reset checklist at midnight */
+let lastDay=todayISO();
+function midnightWatch(){
+  setInterval(()=>{
+    const d=todayISO();
+    if(d!==lastDay){
+      lastDay=d; openSession=null;
+      toast('🌅 New day — checklist reset','info',3500);
+      scheduleNotifications();
+      renderTab(currentTab);
+    }
+  }, 30000);
+}
+function updateSyncBadge(){
+  const b=$('#sbStatus'); if(b){ b.textContent=DB.ready?'Connected':'Local'; b.className='pill '+(DB.ready?'green':'amber'); }
+}
+
+/* =========================================================================
+   BOOT
+   ========================================================================= */
+async function boot(){
+  applyI18n();
+  bindHeader();
+  // load settings from Supabase if profile has connection saved
+  await DB.init();
+  // pull settings/profile from Supabase if connected
+  if(DB.ready){
+    try{
+      const s=await DB.select('settings');
+      s.forEach(r=>{ if(r.key in settings){ settings[r.key]=r.value; LS.set(r.key,r.value); } });
+      const pr=await DB.select('patient_profile');
+      if(pr && pr[0]){ profile=Object.assign({},DEFAULT_PROFILE,pr[0]); LS.set('patient_profile',profile); }
+    }catch(e){}
+  }
+  show('patient');
+  midnightWatch();
+  if('Notification' in window && Notification.permission==='granted') scheduleNotifications();
+
+  // register service worker
+  if('serviceWorker' in navigator){
+    try{ await navigator.serviceWorker.register('sw.js'); }catch(e){ console.warn('SW reg failed',e); }
+  }
+  // first-open: gently ask for notifications
+  if('Notification' in window && Notification.permission==='default'){
+    setTimeout(()=>toast('Tap 🔔 to enable reminders','info',3500), 1500);
+  }
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
