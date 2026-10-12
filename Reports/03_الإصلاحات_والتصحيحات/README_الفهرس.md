@@ -8,22 +8,22 @@
 
 | الملف | الغرض | النوع | آخر تعديل |
 |---|---|---|---|
-| `Correcting_Entries_007_QIB.xlsx` | القيود التصحيحية لبنك 007/QIB | Excel | — |
-| `Evidence_500k.pdf` | Evidence 500k | PDF | — |
-| `Evidence_500k.xlsx` | Evidence 500k | Excel | — |
-| `QIB207_Correction_Execution_Plan.xlsx` | خطة تنفيذ تصحيحات QIB 207 | Excel | — |
+| `Correcting_Entries_007_QIB.xlsx` | القيود التصحيحية لبنك 007/QIB | Excel | 2026-10-12 |
+| `Evidence_500k.pdf` | Evidence 500k | PDF | 2026-10-12 |
+| `Evidence_500k.xlsx` | Evidence 500k | Excel | 2026-10-12 |
+| `QIB207_Correction_Execution_Plan.xlsx` | خطة تنفيذ تصحيحات QIB 207 | Excel | 2026-10-12 |
 
 ### شجرة الحسابات
 
 | الملف | الغرض | النوع | آخر تعديل |
 |---|---|---|---|
-| `Account_Merge_Detail.pdf` | تفاصيل دمج الحسابات المكرّرة | PDF | — |
-| `Account_Merge_Detail.xlsx` | تفاصيل دمج الحسابات المكرّرة | Excel | — |
-| `COA_Cleanup_Log.xlsx` | سجل تنظيف ودمج حسابات شجرة الحسابات | Excel | — |
-| `COA_Restructure_Marwa.xlsx` | COA Restructure Marwa | Excel | — |
-| `COA_Restructure_Report.pdf` | COA Restructure Report | PDF | — |
-| `COA_Restructuring_Map.xlsx` | COA Restructuring Map | Excel | — |
-| `COA_Restructuring_Proposal.pdf` | مقترح إعادة هيكلة شجرة الحسابات | PDF | — |
+| `Account_Merge_Detail.pdf` | تفاصيل دمج الحسابات المكرّرة | PDF | 2026-10-12 |
+| `Account_Merge_Detail.xlsx` | تفاصيل دمج الحسابات المكرّرة | Excel | 2026-10-12 |
+| `COA_Cleanup_Log.xlsx` | سجل تنظيف ودمج حسابات شجرة الحسابات | Excel | 2026-10-12 |
+| `COA_Restructure_Marwa.xlsx` | COA Restructure Marwa | Excel | 2026-10-12 |
+| `COA_Restructure_Report.pdf` | COA Restructure Report | PDF | 2026-10-12 |
+| `COA_Restructuring_Map.xlsx` | COA Restructuring Map | Excel | 2026-10-12 |
+| `COA_Restructuring_Proposal.pdf` | مقترح إعادة هيكلة شجرة الحسابات | PDF | 2026-10-12 |
 
 **إجمالي القسم: 11 ملف**
 
