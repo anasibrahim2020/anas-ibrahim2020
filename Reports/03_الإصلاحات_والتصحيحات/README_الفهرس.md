@@ -12,6 +12,8 @@
 | `Evidence_500k.pdf` | Evidence 500k | PDF | 2026-10-12 |
 | `Evidence_500k.xlsx` | Evidence 500k | Excel | 2026-10-12 |
 | `QIB207_Correction_Execution_Plan.xlsx` | خطة تنفيذ تصحيحات QIB 207 | Excel | 2026-10-12 |
+| `سجل_قيود_التسوية_SLX.pdf` | سجل قيود التسوية SLX | PDF | — |
+| `سجل_قيود_التسوية_SLX.xlsx` | سجل قيود التسوية SLX | Excel | — |
 
 ### شجرة الحسابات
 
@@ -25,6 +27,6 @@
 | `COA_Restructuring_Map.xlsx` | COA Restructuring Map | Excel | 2026-10-12 |
 | `COA_Restructuring_Proposal.pdf` | مقترح إعادة هيكلة شجرة الحسابات | PDF | 2026-10-12 |
 
-**إجمالي القسم: 11 ملف**
+**إجمالي القسم: 13 ملف**
 
 > **القاعدة:** كل مخرج نهائي (PDF) مرفق معه تبريره (Excel) حيثما ينطبق.
